@@ -40,25 +40,13 @@ class State:
         # Create a copy of the current state
         return State(self.player1_state, self.player2_state, self.max_column, self.max_height)
     
-    # Function to calculate score for each player based on the number of connect-fours
-    def calculate_score(self):
-        player1_score = self.count_connections(self.player1_state)
-        player2_score = self.count_connections(self.player2_state)
-
-        return player1_score, player2_score
+    def is_board_complete(self):
+        # Check if the board is full (no empty spots left)
+        full_mask = (1 << (self.max_column * self.max_height)) - 1
+        return (self.player1_state | self.player2_state) == full_mask
     
-    def count_connections(self, state):
-            score = 0
-
-            score += self.__horizontal_check(state)
-            score += self.__vertical_check(state)
-            score += self.__diagonal_check(state)
-            score += self.__anti_diagonal_check(state)
-            
-            return score
-
     # Horizontal check (shift by height to move to the next column)
-    def __horizontal_check(self, state):
+    def _horizontal_check(self, state):
         score = 0
         horizontal = state & (state >> self.max_height)
         horizontal = horizontal & (horizontal >> (2 * self.max_height))
@@ -68,7 +56,7 @@ class State:
         return score
     
     # Vertical check (shift by 1 within the column)
-    def __vertical_check(self, state):
+    def _vertical_check(self, state):
         score = 0
         for col in range(self.max_column):
             # Create a mask for the current column
@@ -85,7 +73,7 @@ class State:
         return score
     
     # Bottom-left to top-right diagonal (shift by max_height + 1)
-    def __diagonal_check(self, state):
+    def _diagonal_check(self, state):
         score = 0
         for col in range(self.max_column - 3):
             for row in range(self.max_height - 3):
@@ -100,7 +88,7 @@ class State:
         return score
     
     # Top-left to bottom-right diagonal (shift by max_height - 1)
-    def __anti_diagonal_check(self, state):
+    def _anti_diagonal_check(self, state):
         score = 0
         for col in range(self.max_column - 3):
             for row in range(3, self.max_height):
