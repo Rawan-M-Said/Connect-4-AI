@@ -7,12 +7,12 @@ class State:
 
     # Suppose a 6 (rows/height) * 7 (columns/width):
         #           Column 1  Column 2  Column 3  Column 4  Column 5  Column 6  Column 7
-        # Height 1  bit 0     bit 6     bit 12    bit 18    bit 24    bit 30    bit 36
-        # Height 2  bit 1     bit 7     bit 13    bit 19    bit 25    bit 31    bit 37
-        # Height 3  bit 2     bit 8     bit 14    bit 20    bit 26    bit 32    bit 38
-        # Height 4  bit 3     bit 9     bit 15    bit 21    bit 27    bit 33    bit 39
-        # Height 5  bit 4     bit 10    bit 16    bit 22    bit 28    bit 34    bit 40
         # Height 6  bit 5     bit 11    bit 17    bit 23    bit 29    bit 35    bit 41
+        # Height 5  bit 4     bit 10    bit 16    bit 22    bit 28    bit 34    bit 40
+        # Height 4  bit 3     bit 9     bit 15    bit 21    bit 27    bit 33    bit 39
+        # Height 3  bit 2     bit 8     bit 14    bit 20    bit 26    bit 32    bit 38
+        # Height 2  bit 1     bit 7     bit 13    bit 19    bit 25    bit 31    bit 37
+        # Height 1  bit 0     bit 6     bit 12    bit 18    bit 24    bit 30    bit 36
     
     def __init__(self, player1_state=0, player2_state=0, column=7, height=6):
         self.player1_state = player1_state
@@ -20,19 +20,6 @@ class State:
         self.max_column = column
         self.max_height = height
 
-    def drop_disc(self, player_num, column):
-        # Find the lowest available row in the chosen column
-        base_pos = (column - 1) * self.max_height
-        for row in range(self.max_height):
-            pos =  base_pos + row
-            if not ((self.player1_state & (1 << pos)) and (self.player2_state & (1 << pos))) :  # If position is empty
-                if player_num == 1:
-                    self.player1_state |= (1 << pos)  # Place the piece
-                else:
-                    self.player2_state |= (1 << pos)  # Place the piece
-                return True
-
-        return False  # indicates failure, so the player should consider another column
 
     # This function should be used in the algorithms, so as not to manipulate the original state
     # Then you can use the returned state to do whatever you want.
