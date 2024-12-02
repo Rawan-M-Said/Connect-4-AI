@@ -59,7 +59,6 @@ class ConnectFour:
 
         def set_depth(value, depth):
             self.selected_depth = depth
-            print(self.selected_depth)
 
         menu.add.selector('Algorithm: ', [(alg, alg) for alg in algorithms], onchange=set_algorithm)
         menu.add.selector('Depth: ', [(str(depth), depth) for depth in depths], onchange=set_depth)
@@ -71,7 +70,6 @@ class ConnectFour:
     def start_game(self):
         self.depth = self.selected_depth
         self.algorithm = AlgorithmFactory(self.selected_algorithm, self.depth)
-        print(self.selected_algorithm, self.selected_depth)
         self.main()
 
     # Check if column is not full
@@ -190,19 +188,14 @@ class ConnectFour:
         player1_bitboard = board_to_state(parent, 1)
         player2_bitboard = board_to_state(parent, 2)
         heuristic = self.tree.get((player2_bitboard, player1_bitboard))
-        i = -1
-        for col in range(self.columns):
-            if self.is_valid_column(col,parent):
-
-                i += 1
-                child_agent = heuristic[i]['agent_state']
-                child_human = heuristic[i]['human_state']
-                child = state_to_board( child_human,child_agent)
-                # child = parent.copy() if parent is not None else self.boardCopy.copy()
-                # row = self.get_next_open_row(col,self.boardCopy)
-                # child[row][col] = player
-                children.append((child, heuristic[i]['heuristic']))
-        return children
+        if heuristic:
+            for state in heuristic:
+                if 'agent_state' in state and 'human_state' in state:
+                    child_agent = state['agent_state']
+                    child_human = state['human_state']
+                    child = state_to_board( child_human,child_agent)
+                    children.append((child, state['heuristic']))
+            return children
     def draw_children(self, screen, children):
         child_width = self.columns * SQUARE_SIZE // 7
         child_height = self.rows * SQUARE_SIZE // 7
@@ -272,10 +265,8 @@ class ConnectFour:
                             last_state = previous_states.pop()
                             self.show_tree(last_state['player'], last_state['board'], previous_states)
                     if 400 < event.pos[1] < 500:
-                        print(self.current_depth)
-                        print(self.depth)
+
                         if self.current_depth < self.depth:
-                            print(self.current_depth)
                             self.current_depth += 1
                             for i, x_offset in enumerate(self.x_offsets):
                                 if x_offset < event.pos[0] < x_offset + 100:

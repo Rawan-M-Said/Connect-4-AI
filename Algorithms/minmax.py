@@ -6,8 +6,16 @@ import math
 class Minmax(Algorithm):
     def __init__(self):
         super().__init__()
+        self.transposition_table = {}
             
     def solve(self, agent_state, human_state, is_maximizing, depth=10):
+
+        state_key = self.__get_symmetric_key(agent_state, human_state) + (is_maximizing,)
+
+        #  If the key has been already evaluated, then don't reevaluate it.
+        if state_key in self.transposition_table:
+            return self.transposition_table[state_key]
+
         # base case when depth is zero or the board is complete
         if depth == 0 or (agent_state + human_state) == (1<<42)-1:
             heuristic = Heuristic(agent_state, human_state)
@@ -55,7 +63,9 @@ class Minmax(Algorithm):
                 if min_eval > eval :
                     min_eval = eval
                     best_col = i
+            result = (min_eval, best_col)
                     
+            self.transposition_table[state_key] = result
             return min_eval, best_col
     
     def save_node_in_tree(self, agent_state, human_state, child_state, column, heuristic, is_agent_move):
@@ -83,8 +93,28 @@ class Minmax(Algorithm):
                 "human_state": child_state           
             })
             
+    def __flip_state(self, state):
+
+        flipped_state = 0
+        for col in range(7):
+            column_mask = (0b111111 << (col * 6)) 
+            column_bits = (state & column_mask) >> (col * 6)
+            
+            flipped_column_pos = 6 - col
+            flipped_state |= (column_bits << (flipped_column_pos * 6))
+        return flipped_state
     
+    def __get_symmetric_key(self, agent_state, human_state):
     
+        # Flip both states
+        flipped_agent_state = self.__flip_state(agent_state)
+        flipped_human_state = self.__flip_state(human_state)
+        
+        # Compare (agent_state, human_state) pairs lexicographically
+        original = (agent_state, human_state)
+        flipped = (flipped_agent_state, flipped_human_state)
+        
+        return min(original, flipped)
     
 if __name__ == "__main__":
 

@@ -15,6 +15,7 @@ class MinmaxWithPruning(Algorithm):
             eval = heuristic.calculate_heuristic()
             self.save_node_in_tree(agent_state, human_state, None, None, eval, None)
             return eval, None
+        
         arr = [3, 4, 2, 5, 1, 6, 0]
         best_col = None
         if is_maximizing:

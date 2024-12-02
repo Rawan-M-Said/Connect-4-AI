@@ -22,7 +22,7 @@ class Algorithm:
         return -1
     
     def save_node_in_tree(self, agent_state, human_state, child_state, column, heuristic, is_agent_move):
-        
+        self.node_expanded += 1
         parent_key = (agent_state, human_state)
         if parent_key not in self.tree:
             self.tree[parent_key] = []
