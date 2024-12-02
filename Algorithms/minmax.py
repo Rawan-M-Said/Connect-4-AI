@@ -5,7 +5,7 @@ import math
 
 class Minmax(Algorithm):
     def __init__(self):
-        pass
+        super().__init__()
             
     def solve(self, agent_state, human_state, is_maximizing, depth=10):
         # base case when depth is zero or the board is complete

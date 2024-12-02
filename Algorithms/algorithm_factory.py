@@ -21,6 +21,6 @@ class AlgorithmFactory:
         self.algorithm.reset_attributes()
         human_state = board_to_state(board, 1)
         agent_state = board_to_state(board, 2)
-        _, best_move = self.algorithm.solve(agent_state, human_state, True, depth=1)
+        _, best_move = self.algorithm.solve(agent_state, human_state, True, depth=8)
         return best_move, self.algorithm.tree, self.algorithm.node_expanded
     

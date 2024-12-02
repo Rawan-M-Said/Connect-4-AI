@@ -35,7 +35,7 @@ class ConnectFour:
         self.boardCopy = self.board.copy()
         self.x_offsets = []
         self.tree = {}
-        self.algorithm = AlgorithmFactory("minmax without alpha-beta pruning")
+        self.algorithm = AlgorithmFactory("minmax with alpha-beta pruning")
 
     # Check if column is not full
     def is_valid_column(self, column,board):
