@@ -16,18 +16,10 @@ class Minmax(Algorithm):
         if state_key in self.transposition_table:
             return self.transposition_table[state_key]
 
-        # base case when depth is zero
-        if depth == 0 :
+        # base case when depth is zero or the board is complete
+        if depth == 0 or (agent_state + human_state) == (1<<42)-1:
             heuristic = Heuristic(agent_state, human_state)
             eval = heuristic.calculate_heuristic()
-            self.save_node_in_tree(agent_state, human_state, None, None, eval, None)
-            return eval, None
-        
-        # Base case when the board is complete
-        if (agent_state + human_state) == (1<<42)-1 :
-            heuristic = Heuristic(agent_state, human_state)
-            score1, score2 = heuristic.calculate_score()
-            eval = score2 - score1
             self.save_node_in_tree(agent_state, human_state, None, None, eval, None)
             return eval, None
         
