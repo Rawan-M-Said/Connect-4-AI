@@ -36,7 +36,7 @@ class Heuristic (State):
         score = 0
 
         score += self.__evaluate(self.player1_state)
-        # score -= self.__evaluate(self.player2_state)
+        score -= self.__evaluate(self.player2_state)
 
         # Adding center control
         score += self.__center_control(self.player1_state) * weights['center']

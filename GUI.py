@@ -2,9 +2,10 @@ import sys
 import numpy as np
 import pygame
 
+from Algorithms.algorithm import Algorithm
 from heuristic import Heuristic
-from minmax import Minmax
-from utilities import board_to_state, drop_disc, get_lowest_available_row
+from Algorithms.minmax import Minmax
+from Algorithms.utilities import board_to_state, drop_disc, get_lowest_available_row
 
 SQUARE_SIZE = 100
 NAVBAR_SIZE = 400
@@ -26,7 +27,7 @@ class ConnectFour:
         self.columns = columns
         self.rows = rows
         self.board = np.zeros((rows, columns), dtype=int)
-        self.turn = 2
+        self.turn = 1
         self.game_over = False
         self.winner = None
         self.moves = 0
@@ -35,6 +36,7 @@ class ConnectFour:
         self.boardCopy = self.board.copy()
         self.x_offsets = []
         self.tree = {}
+        self.algorithm = Algorithm("minmax without alpha-beta pruning")
 
     # Check if column is not full
     def is_valid_column(self, column,board):
@@ -326,11 +328,7 @@ class ConnectFour:
                                 self.show_tree(player,children[i][0])
 
     def ai_move(self):
-        minmax = Minmax()
-        player1_bitboard = board_to_state(self.board, 1)
-        player2_bitboard = board_to_state(self.board, 2)
-        _, best_move = minmax.minmax(player2_bitboard, player1_bitboard, True, depth=4)
-        self.tree = minmax.tree
+        best_move, self.tree = self.algorithm.solve(self.board)
         print(self.tree)
         self.drop_piece(best_move)
         self.check_connect_four(self.turn, self.get_next_open_row(best_move,self.board), best_move)
