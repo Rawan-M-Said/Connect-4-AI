@@ -190,18 +190,12 @@ class ConnectFour:
         player1_bitboard = board_to_state(parent, 1)
         player2_bitboard = board_to_state(parent, 2)
         heuristic = self.tree.get((player2_bitboard, player1_bitboard))
-        i = -1
-        for col in range(self.columns):
-            if self.is_valid_column(col,parent):
-
-                i += 1
-                child_agent = heuristic[i]['agent_state']
-                child_human = heuristic[i]['human_state']
+        print(heuristic)
+        for state in heuristic:
+                child_agent = state['agent_state']
+                child_human = state['human_state']
                 child = state_to_board( child_human,child_agent)
-                # child = parent.copy() if parent is not None else self.boardCopy.copy()
-                # row = self.get_next_open_row(col,self.boardCopy)
-                # child[row][col] = player
-                children.append((child, heuristic[i]['heuristic']))
+                children.append((child, state['heuristic']))
         return children
     def draw_children(self, screen, children):
         child_width = self.columns * SQUARE_SIZE // 7
