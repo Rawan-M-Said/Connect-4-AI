@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import pygame
 
-from state import State
+from heuristic import Heuristic
 from minmax import Minmax
 from utilities import board_to_state, drop_disc, get_lowest_available_row
 
@@ -154,27 +154,9 @@ class ConnectFour:
     def check_connect_four(self, player, row, col):
         player1_bitboard = board_to_state(self.board, 1)
         player2_bitboard = board_to_state(self.board, 2)
-        state = State(player1_bitboard, player2_bitboard)
+        state = Heuristic(player1_bitboard, player2_bitboard)
 
-        if player == 1:
-            player_state = state.player1_state
-        else:
-            player_state = state.player2_state
-
-        connect4s = 0
-        if state._horizontal_check(player_state):
-            connect4s += 1
-        if state._vertical_check(player_state):
-            connect4s += 1
-        if state._diagonal_check(player_state):
-            connect4s += 1
-        if state._anti_diagonal_check(player_state):
-            connect4s += 1
-
-        if player == 1:
-            self.player1_score += connect4s
-        else:
-            self.player2_score += connect4s
+        self.player1_score, self.player2_score = state.calculate_score()
 
     def draw_navbar(self, screen):
         pygame.draw.rect(screen, BACKGROUND_COLOR, (self.columns * SQUARE_SIZE, 0, NAVBAR_SIZE, (self.rows + 1) * SQUARE_SIZE))
@@ -347,12 +329,12 @@ class ConnectFour:
         minmax = Minmax()
         player1_bitboard = board_to_state(self.board, 1)
         player2_bitboard = board_to_state(self.board, 2)
-        _, best_move = minmax.minmax(player2_bitboard, player1_bitboard, True, depth=4)
+        _, best_move = minmax.minmax(player1_bitboard, player2_bitboard, True, depth=4)
         self.tree = minmax.tree
         print(self.tree)
         self.drop_piece(best_move)
         self.check_connect_four(self.turn, self.get_next_open_row(best_move,self.board), best_move)
-        self.turn = 1  # Switch back to the human player
+        self.turn = 2  # Switch back to the human player
 
     def main(self):
         width = self.columns * SQUARE_SIZE
@@ -378,7 +360,7 @@ class ConnectFour:
                         event.pos[1] < 550 + 50:
                         print(self.boardCopy)
                         self.show_tree(2,self.boardCopy)
-                    if self.turn == 1:  # Human player's turn
+                    if self.turn == 2:  # Human player's turn
                         if event.pos[0] > width:
                             continue
                         column = int(event.pos[0] // SQUARE_SIZE)
@@ -387,7 +369,7 @@ class ConnectFour:
                             self.drop_piece(column)
                             self.check_connect_four(self.turn, row, column)
                             self.boardCopy = self.board.copy()
-                            self.turn = 2  # Switch to AI's turn
+                            self.turn = 1  # Switch to AI's turn
                             self.draw_board(screen, self.board)
                             self.draw_navbar(screen)
                             pygame.display.update()
@@ -399,7 +381,7 @@ class ConnectFour:
                                 pygame.time.wait(3000)
                                 pygame.quit()
                                 sys.exit()
-            if self.turn == 2 and not self.game_over:  # AI's turn
+            if self.turn == 1 and not self.game_over:  # AI's turn
                 self.ai_move()
                 self.draw_board(screen, self.board)
                 self.draw_navbar(screen)
