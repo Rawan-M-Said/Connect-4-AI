@@ -18,10 +18,14 @@ class AlgorithmFactory:
                 self.algorithm = ExpectedMinmax()
                 
             
-    def solve(self, board):
+    def solve(self, board, turn = 2):
         self.algorithm.reset_attributes()
-        human_state = board_to_state(board, 1)
-        agent_state = board_to_state(board, 2)
+        if turn == 1 :
+            agent_state = board_to_state(board, 1)
+            human_state = board_to_state(board, 2)
+        else :
+            agent_state = board_to_state(board, 2)
+            human_state = board_to_state(board, 1)
         _, best_move = self.algorithm.solve(agent_state, human_state, True, depth=self.depth)
         return best_move, self.algorithm.tree, self.algorithm.node_expanded
     
