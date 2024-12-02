@@ -5,10 +5,18 @@ import math
 class ExpectedMinmax(Algorithm):
     def __init__(self):
         self.prev_node_type =  'max'
+        self.transposition_table = {}
         super().__init__()
 
     def solve(self, agent_state, human_state, node_type, depth=10,column=0):
         print("Solving",depth)
+
+        state_key = (agent_state, human_state, node_type)
+
+        #  If the key has been already evaluated, then don't reevaluate it.
+        if state_key in self.transposition_table:
+            return self.transposition_table[state_key]
+
         # base case when depth is zero or the board is complete
         if depth == 0 or (agent_state + human_state) == (1<<42)-1:
             heuristic = Heuristic(agent_state, human_state)
@@ -30,6 +38,9 @@ class ExpectedMinmax(Algorithm):
                 if max_eval < eval:
                     max_eval = eval
                     best_col = i
+            result = (max_eval, best_col)
+                    
+            self.transposition_table[state_key] = result
             return max_eval, best_col
 
         elif node_type == 'min':
@@ -45,6 +56,9 @@ class ExpectedMinmax(Algorithm):
                 if min_eval > eval:
                     min_eval = eval
                     best_col = i
+            result = (min_eval, best_col)
+                    
+            self.transposition_table[state_key] = result
             return min_eval, best_col
 
         elif node_type == 'chance':

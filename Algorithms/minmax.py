@@ -10,7 +10,7 @@ class Minmax(Algorithm):
             
     def solve(self, agent_state, human_state, is_maximizing, depth=10):
 
-        state_key = self.__get_symmetric_key(agent_state, human_state) + (is_maximizing,)
+        state_key = (agent_state, human_state, is_maximizing)
 
         #  If the key has been already evaluated, then don't reevaluate it.
         if state_key in self.transposition_table:
@@ -42,7 +42,9 @@ class Minmax(Algorithm):
                 if max_eval < eval :
                     max_eval = eval
                     best_col = i
-                
+                result = (max_eval, best_col)
+                    
+            self.transposition_table[state_key] = result
             return max_eval, best_col
                 
         else :
@@ -92,29 +94,6 @@ class Minmax(Algorithm):
                 "agent_state": agent_state,           
                 "human_state": child_state           
             })
-            
-    def __flip_state(self, state):
-
-        flipped_state = 0
-        for col in range(7):
-            column_mask = (0b111111 << (col * 6)) 
-            column_bits = (state & column_mask) >> (col * 6)
-            
-            flipped_column_pos = 6 - col
-            flipped_state |= (column_bits << (flipped_column_pos * 6))
-        return flipped_state
-    
-    def __get_symmetric_key(self, agent_state, human_state):
-    
-        # Flip both states
-        flipped_agent_state = self.__flip_state(agent_state)
-        flipped_human_state = self.__flip_state(human_state)
-        
-        # Compare (agent_state, human_state) pairs lexicographically
-        original = (agent_state, human_state)
-        flipped = (flipped_agent_state, flipped_human_state)
-        
-        return min(original, flipped)
     
 if __name__ == "__main__":
 
