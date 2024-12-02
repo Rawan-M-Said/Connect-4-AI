@@ -1,10 +1,11 @@
+import pygame
+import pygame_menu
 import sys
 import numpy as np
-import pygame
 
 from Algorithms.algorithm_factory import AlgorithmFactory
 from heuristic import Heuristic
-from Algorithms.utilities import board_to_state
+from Algorithms.utilities import board_to_state, state_to_board
 
 SQUARE_SIZE = 100
 NAVBAR_SIZE = 400
@@ -19,9 +20,10 @@ FONT_SIZE = 32
 FONT_FAMILY = 'fonts/Doto.ttf'
 
 
+
+
 class ConnectFour:
     def __init__(self, columns=7, rows=6):
-
         pygame.init()
         self.columns = columns
         self.rows = rows
@@ -35,7 +37,42 @@ class ConnectFour:
         self.boardCopy = self.board.copy()
         self.x_offsets = []
         self.tree = {}
-        self.algorithm = AlgorithmFactory("minmax with alpha-beta pruning")
+        self.current_depth = 1
+        self.depth = 4
+        self.selected_algorithm = "minmax without alpha-beta pruning"
+        self.selected_depth = 1
+        self.node_expanded = 0
+
+    def main_menu(self):
+        width = self.columns * SQUARE_SIZE + NAVBAR_SIZE
+        height = (self.rows + 1) * SQUARE_SIZE
+        screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Connect Four - Main Menu")
+
+        menu = pygame_menu.Menu('Connect Four', width, height, theme=pygame_menu.themes.THEME_DARK)
+
+        algorithms = ["minmax without alpha-beta pruning", "minmax with alpha-beta pruning", "expected minmax"]
+        depths = list(range(1, 11))
+
+        def set_algorithm(value, algorithm):
+            self.selected_algorithm = algorithm
+
+        def set_depth(value, depth):
+            self.selected_depth = depth
+            print(self.selected_depth)
+
+        menu.add.selector('Algorithm: ', [(alg, alg) for alg in algorithms], onchange=set_algorithm)
+        menu.add.selector('Depth: ', [(str(depth), depth) for depth in depths], onchange=set_depth)
+        menu.add.button('Play', self.start_game)
+        menu.add.button('Quit', pygame_menu.events.EXIT)
+
+        menu.mainloop(screen)
+
+    def start_game(self):
+        self.depth = self.selected_depth
+        self.algorithm = AlgorithmFactory(self.selected_algorithm, self.depth)
+        print(self.selected_algorithm, self.selected_depth)
+        self.main()
 
     # Check if column is not full
     def is_valid_column(self, column,board):
@@ -55,100 +92,6 @@ class ConnectFour:
         self.board[row][column] = self.turn
         self.moves += 1
 
-
-
-    # # Check for connect four horizontally
-    # def horizontal_check(self, player, row, col):
-    #     count = 1
-    #     for c in range(col-1,-1,-1):
-    #         if self.board[row][c] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #     for c in range(col+1, self.columns):
-    #         if self.board[row][c] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #
-    # # Check for connect four vertically
-    # def vertical_check(self, player, row, col):
-    #     count = 1
-    #     for r in range(row-1,-1,-1):
-    #         if self.board[r][col] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #     for r in range(row+1, self.rows):
-    #         if self.board[r][col] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #
-    # # Check for connect four diagonally
-    # # Check for top-left to bottom-right diagonal (TL + BR)
-    # def diagonal_check(self, player, row, col):
-    #     # TL
-    #     count = 1
-    #     r = row - 1
-    #     c = col - 1
-    #     while r >= 0 and c >= 0:
-    #         if self.board[r][c] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #         r -= 1
-    #         c -= 1
-    #     # BR
-    #     r = row + 1
-    #     c = col + 1
-    #     while r < self.rows and c < self.columns:
-    #         if self.board[r][c] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #         r += 1
-    #         c += 1
-    #
-    # # Check for top-right to bottom-left diagonal (TR + BL)
-    # def anti_diagonal_check(self, player, row, col):
-    #     # TR
-    #     count = 1
-    #     r = row - 1
-    #     c = col + 1
-    #     while r >= 0 and c < self.columns:
-    #         if self.board[r][c] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #         r -= 1
-    #         c += 1
-    #     r = row + 1
-    #     c = col - 1
-    #     # BL
-    #     while r < self.rows and c >= 0:
-    #         if self.board[r][c] == player:
-    #             count += 1
-    #         else:
-    #             break
-    #         if count == 4:
-    #             return True
-    #         r += 1
-    #         c -= 1
 
 
     # Check for connect four
@@ -246,24 +189,20 @@ class ConnectFour:
         children = []
         player1_bitboard = board_to_state(parent, 1)
         player2_bitboard = board_to_state(parent, 2)
-        print(self.tree)
         heuristic = self.tree.get((player2_bitboard, player1_bitboard))
         i = -1
         for col in range(self.columns):
-            if self.is_valid_column(col,self.boardCopy):
+            if self.is_valid_column(col,parent):
+
                 i += 1
-                child = parent.copy() if parent is not None else self.boardCopy.copy()
-                row = self.get_next_open_row(col,self.boardCopy)
-                child[row][col] = player
-                print(col)
-                print(player1_bitboard)
-                print(player2_bitboard)
-                print(heuristic)
-                print(heuristic[i])
-                print(heuristic[i]['heuristic'])
+                child_agent = heuristic[i]['agent_state']
+                child_human = heuristic[i]['human_state']
+                child = state_to_board( child_human,child_agent)
+                # child = parent.copy() if parent is not None else self.boardCopy.copy()
+                # row = self.get_next_open_row(col,self.boardCopy)
+                # child[row][col] = player
                 children.append((child, heuristic[i]['heuristic']))
         return children
-
     def draw_children(self, screen, children):
         child_width = self.columns * SQUARE_SIZE // 7
         child_height = self.rows * SQUARE_SIZE // 7
@@ -289,24 +228,31 @@ class ConnectFour:
             text_rect = text.get_rect(center=(child_center_x, y_offset + child_height + 30))
             screen.blit(text, text_rect)
 
-    def show_tree(self,player,board):
+    def show_tree(self, player, board, previous_states=[]):
         width = self.columns * SQUARE_SIZE + NAVBAR_SIZE
         height = (self.rows + 1) * SQUARE_SIZE
         screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Tree Visualisation")
         screen.fill(GRAY_COLOR)
         children = self.generate_children(player, board)
-        x_offset = (width - self.columns * SQUARE_SIZE // 7) //2
-        self.draw_board(screen, board,x_offset, 100, scale=1 / 7)
+        x_offset = (width - self.columns * SQUARE_SIZE // 7) // 2
+        self.draw_board(screen, board, x_offset, 100, scale=1 / 7)
         self.draw_children(screen, children)
         pygame.display.update()
-        # back button img
+
+        # Back button image
         back_button = pygame.image.load("images/back.png")
         back_button = pygame.transform.scale(back_button, (50, 50))
         screen.blit(back_button, (10, 10))
-        # node expanded
+
+        # forward button image
+        forward_button = pygame.image.load("images/forward.png")
+        forward_button = pygame.transform.scale(forward_button, (50, 50))
+        screen.blit(forward_button, (width - 60, 10))
+
+        # Node expanded
         font = pygame.font.Font(None, FONT_SIZE)
-        text = font.render("Nodes Expanded: {}".format(7), True, WHITE_COLOR)
+        text = font.render("Nodes Expanded: {}".format(self.node_expanded), True, WHITE_COLOR)
         screen.blit(text, (width // 2 - 100, 50))
         pygame.display.update()
 
@@ -318,20 +264,31 @@ class ConnectFour:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 10 < event.pos[0] < 60 and 10 < event.pos[1] < 60:
-                        self.main()
+                            self.current_depth = 1
+                            self.main()
+                    if width - 60 < event.pos[0] < width - 10 and 10 < event.pos[1] < 60:
+                        if previous_states:
+                            self.current_depth -= 1
+                            last_state = previous_states.pop()
+                            self.show_tree(last_state['player'], last_state['board'], previous_states)
                     if 400 < event.pos[1] < 500:
-                        for i, x_offset in enumerate(self.x_offsets):
-                             if x_offset < event.pos[0] < x_offset + 100:
-                                player = 1 if player == 2 else 2
-                                print('jhgj',children[i][0])
-                                self.show_tree(player,children[i][0])
+                        print(self.current_depth)
+                        print(self.depth)
+                        if self.current_depth < self.depth:
+                            print(self.current_depth)
+                            self.current_depth += 1
+                            for i, x_offset in enumerate(self.x_offsets):
+                                if x_offset < event.pos[0] < x_offset + 100:
+                                    player = 1 if player == 2 else 2
+                                    previous_states.append({'player': player, 'board': board})
+                                    self.show_tree(player, children[i][0], previous_states)
 
     def ai_move(self):
-        best_move, self.tree,_ = self.algorithm.solve(self.board)
-        print(self.tree)
+        best_move, self.tree,self.node_expanded = self.algorithm.solve(self.board)
         self.drop_piece(best_move)
         self.check_connect_four(self.turn, self.get_next_open_row(best_move,self.board), best_move)
         self.turn = 1  # Switch back to the human player
+
 
     def main(self):
         width = self.columns * SQUARE_SIZE
@@ -349,20 +306,24 @@ class ConnectFour:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_x:
+                        self.main_menu()
+                        return
                 if event.type == pygame.MOUSEMOTION:
                     posix = event.pos[0]
                     self.draw_circle(screen, posix, width)
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.columns * SQUARE_SIZE + 60 < event.pos[0] < self.columns * SQUARE_SIZE + 60 + 200 and 550 < \
-                        event.pos[1] < 550 + 50:
-                        print(self.boardCopy)
-                        self.show_tree(2,self.boardCopy)
+                    if self.columns * SQUARE_SIZE + 60 < event.pos[
+                        0] < self.columns * SQUARE_SIZE + 60 + 200 and 550 < \
+                            event.pos[1] < 550 + 50:
+                        self.show_tree(2, self.boardCopy)
                     if self.turn == 1:  # Human player's turn
                         if event.pos[0] > width:
                             continue
                         column = int(event.pos[0] // SQUARE_SIZE)
-                        if self.is_valid_column(column,self.board):
-                            row = self.get_next_open_row(column,self.board)
+                        if self.is_valid_column(column, self.board):
+                            row = self.get_next_open_row(column, self.board)
                             self.drop_piece(column)
                             self.check_connect_four(self.turn, row, column)
                             self.boardCopy = self.board.copy()
@@ -394,4 +355,4 @@ class ConnectFour:
 
 if __name__ == "__main__":
     game = ConnectFour()
-    game.main()
+    game.main_menu()

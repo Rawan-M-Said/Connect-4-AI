@@ -7,7 +7,8 @@ from Algorithms.utilities import board_to_state
 
 
 class AlgorithmFactory:
-    def __init__(self, algorithm_name):
+    def __init__(self, algorithm_name,depth):
+        self.depth = depth
         match algorithm_name:
             case "minmax without alpha-beta pruning":
                 self.algorithm = Minmax()
@@ -21,6 +22,6 @@ class AlgorithmFactory:
         self.algorithm.reset_attributes()
         human_state = board_to_state(board, 1)
         agent_state = board_to_state(board, 2)
-        _, best_move = self.algorithm.solve(agent_state, human_state, True, depth=8)
+        _, best_move = self.algorithm.solve(agent_state, human_state, True, depth=self.depth)
         return best_move, self.algorithm.tree, self.algorithm.node_expanded
     
