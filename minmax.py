@@ -15,7 +15,6 @@ class Minmax:
             return heuristic.calculate_heuristic(), None
         
         best_col = None
-        self.tree[(agent_state,human_state)] = []        
         if is_maximizing:
             max_eval = -math.inf
             # check all possible children
@@ -59,7 +58,10 @@ class Minmax:
             return min_eval, best_col
     
     def save_node_in_tree(self, agent_state, human_state, column, heuristic):
+        
         parent_key = (agent_state, human_state)
+        if parent_key not in self.tree:
+            self.tree[parent_key] = []
         self.tree[parent_key].append({
             "column": column,
             "heuristic": heuristic,
@@ -73,9 +75,9 @@ if __name__ == "__main__":
         [0, 0, 0, 0, 0, 0, 0],   
         [0, 0, 0, 0, 0, 0, 0],   
         [0, 0, 0, 0, 0, 0, 0],   
-        [0, 0, 0, 0, 0, 0, 0],   
-        [0, 0, 0, 0, 0, 0, 0],   
-        [0, 0, 0, 0, 0, 0, 0],   
+        [0, 1, 0, 0, 0, 0, 0],   
+        [0, 1, 0, 0, 0, 0, 0],   
+        [0, 1, 2, 2, 2, 0, 0],   
     ]
 
 
@@ -84,10 +86,7 @@ if __name__ == "__main__":
     player2_bitboard = board_to_state(board, 2)
 
     minmax = Minmax()
-    _ , col = minmax.minmax(player1_bitboard, player2_bitboard, True, 3)
+    _ , col = minmax.minmax(player1_bitboard, player2_bitboard, True, 2)
     print(col)
 
     print(minmax.tree)
-
-
-
