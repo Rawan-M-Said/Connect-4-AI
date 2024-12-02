@@ -26,7 +26,7 @@ class ConnectFour:
         self.columns = columns
         self.rows = rows
         self.board = np.zeros((rows, columns), dtype=int)
-        self.turn = 2
+        self.turn = 1
         self.game_over = False
         self.winner = None
         self.moves = 0

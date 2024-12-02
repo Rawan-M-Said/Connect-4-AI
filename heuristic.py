@@ -36,7 +36,7 @@ class Heuristic (State):
         score = 0
 
         score += self.__evaluate(self.player1_state)
-        # score -= self.__evaluate(self.player2_state)
+        score -= self.__evaluate(self.player2_state)
 
         # Adding center control
         score += self.__center_control(self.player1_state) * weights['center']
@@ -54,8 +54,8 @@ class Heuristic (State):
         # Check horizontal, vertical, diagonal, and anti-diagonal connections
         score += self._horizontal_check(state) * 10  # Horizontal gets moderate weight
         score += self._vertical_check(state) * 20    # Vertical is more important
-        score += self._diagonal_check(state) * 15    # Diagonal gets moderate weight
-        score += self._anti_diagonal_check(state) * 15  # Anti-diagonal gets moderate weight
+        score += self._diagonal_check(state) * 20    # Diagonal gets moderate weight
+        score += self._anti_diagonal_check(state) * 20  # Anti-diagonal gets moderate weight
         
         return score
     
