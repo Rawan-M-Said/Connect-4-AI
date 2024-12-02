@@ -1,23 +1,24 @@
-
-
-from Algorithms.expected_minmax import ExpectedMinmax
-from Algorithms.minmax import Minmax
-from Algorithms.minmax_with_pruning import MinmaxWithPruning
-from Algorithms.utilities import board_to_state
-
-
 class Algorithm:
-    def __init__(self, algorithm):
-        match algorithm:
-            case "minmax without alpha-beta pruning":
-                self.algorithm = Minmax()
-            case "minmax with alpha-beta pruning":
-                self.algorithm = MinmaxWithPruning()
-            case _:
-                self.algorithm = ExpectedMinmax()
+    def __init__(self):
+        self.tree = {}
+        self.node_expanded = 0
         
-    def solve(self, board):
-        human_state = board_to_state(board, 1)
-        agent_state = board_to_state(board, 2)
-        _, best_move = self.algorithm.solve(agent_state, human_state, True, depth=4)
-        return best_move, self.algorithm.tree
+    def reset_attributes(self):
+        self.tree = {}
+        self.node_expanded = 0
+    
+    @staticmethod
+    def drop_disc(player_state, column, row):
+        pos = column * 6 + row
+        return player_state | (1 << pos)  # Place the piece
+    
+    @staticmethod
+    def get_lowest_available_row(agent_state, human_state, column):
+        base_pos = column * 6
+        for row in range(6):
+            pos =  base_pos + row
+            if not ((agent_state & (1 << pos)) or (human_state & (1 << pos))) :  
+                return row
+        return -1
+                
+            
