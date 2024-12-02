@@ -115,13 +115,13 @@ class Heuristic (State):
                     left_empty = self.__check_empty_slot(row + 3, col) if row <= self.max_height - 4 else False
                     right_empty = self.__check_empty_slot(row - 1, col) if row > 0 else False
                     if left_empty or right_empty:
-                        score += weights['three_connect']  # Favor 3-connected with both sides open
+                        score += 2*weights['three_connect']  # Favor 3-connected with both sides open
                 
                 elif num_connected == 2:
                     left_empty = self.__check_empty_slot(row, col + 2) if col <= self.max_column - 3 else False
                     right_empty = self.__check_empty_slot(row, col - 1) if col > 0 else False
                     if left_empty or right_empty:
-                        score += weights['two_connect']  # Favor 2-connected with one open side
+                        score += 2*weights['two_connect']  # Favor 2-connected with one open side
         return score
 
     def __connected_check_diagonal(self, state, weights):
@@ -139,13 +139,13 @@ class Heuristic (State):
                     left_empty = self.__check_empty_slot(row + 3, col + 3) if row <= self.max_height - 4 and col <= self.max_column - 4 else False
                     right_empty = self.__check_empty_slot(row - 1, col - 1) if row > 0 and col > 0 else False
                     if left_empty or right_empty:
-                        score += weights['three_connect']  # Favor 3-connected with both sides open
+                        score += 2*weights['three_connect']  # Favor 3-connected with both sides open
                 
                 elif num_connected == 2:
                     left_empty = self.__check_empty_slot(row + 2, col + 2) if row <= self.max_height - 3 and col <= self.max_column - 3 else False
                     right_empty = self.__check_empty_slot(row - 1, col - 1) if row > 0 and col > 0 else False
                     if left_empty or right_empty:
-                        score += weights['two_connect']  # Favor 2-connected with one open side
+                        score += 2*weights['two_connect']  # Favor 2-connected with one open side
         return score
 
     def __connected_check_anti_diagonal(self, state, weights):
@@ -164,13 +164,13 @@ class Heuristic (State):
                         left_empty = self.__check_empty_slot(row - 3, col + 3) if row >= 3 and col <= self.max_column - 4 else False
                         right_empty = self.__check_empty_slot(row + 1, col - 1) if row <= self.max_height - 2 and col > 0 else False
                         if left_empty or right_empty:
-                            score += weights['three_connect']  # Favor 3-connected with both sides open
+                            score += 2*weights['three_connect']  # Favor 3-connected with both sides open
                     
                     elif num_connected == 2:
                         left_empty = self.__check_empty_slot(row - 2, col + 2) if row >=2 and col <= self.max_column - 3 else False
                         right_empty = self.__check_empty_slot(row + 1, col - 1) if row <= self.max_height - 2 and col > 0 else False
                         if left_empty or right_empty:
-                            score += weights['two_connect']  # Favor 2-connected with one open side
+                            score += 2*weights['two_connect']  # Favor 2-connected with one open side
         return score
     
     def __num_connected(self, state, positions):
