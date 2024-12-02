@@ -28,7 +28,7 @@ class Minmax:
                 child_state = drop_disc(agent_state, i, lowest_row)
                 eval, _ = self.minmax(child_state, human_state, not is_maximizing, depth-1)
                 # save in the tree
-                self.save_node_in_tree(agent_state, human_state, i, eval)
+                self.save_node_in_tree(agent_state, human_state, child_state, i, eval, True)
                 
                 if max_eval < eval :
                     max_eval = eval
@@ -49,7 +49,7 @@ class Minmax:
                 child_state = drop_disc(human_state, i, lowest_row)
                 eval, _ = self.minmax(agent_state, child_state, not is_maximizing, depth-1) 
                 # save in the tree
-                self.save_node_in_tree(agent_state, human_state, i, eval)
+                self.save_node_in_tree(agent_state, human_state, child_state, i, eval, False)
                 
                 if min_eval > eval :
                     min_eval = eval
@@ -57,15 +57,27 @@ class Minmax:
                     
             return min_eval, best_col
     
-    def save_node_in_tree(self, agent_state, human_state, column, heuristic):
+    def save_node_in_tree(self, agent_state, human_state, child_state, column, heuristic, is_agent_move):
         
         parent_key = (agent_state, human_state)
         if parent_key not in self.tree:
             self.tree[parent_key] = []
-        self.tree[parent_key].append({
-            "column": column,
-            "heuristic": heuristic,
-        })
+            
+        if is_agent_move:
+            self.tree[parent_key].append({
+                "column": column,
+                "heuristic": heuristic,
+                "agent_state": child_state,          
+                "human_state": human_state           
+            })
+        else:
+            self.tree[parent_key].append({
+                "column": column,
+                "heuristic": heuristic,
+                "agent_state": agent_state,           
+                "human_state": child_state           
+            })
+            
     
     
     
@@ -73,11 +85,11 @@ if __name__ == "__main__":
 
     board = [
         [0, 0, 0, 0, 0, 0, 0],   
-        [0, 0, 0, 0, 0, 0, 0],   
-        [0, 0, 0, 0, 0, 0, 0],   
-        [0, 1, 0, 0, 0, 0, 0],   
-        [0, 1, 0, 0, 0, 0, 0],   
-        [0, 1, 2, 2, 2, 0, 0],   
+        [0, 0, 1, 1, 1, 0, 0],   
+        [0, 1, 1, 1, 1, 0, 0],   
+        [0, 1, 1, 1, 1, 0, 0],   
+        [0, 1, 1, 1, 2, 0, 0],   
+        [1, 1, 2, 2, 2, 2, 1],   
     ]
 
 
@@ -86,7 +98,8 @@ if __name__ == "__main__":
     player2_bitboard = board_to_state(board, 2)
 
     minmax = Minmax()
-    _ , col = minmax.minmax(player1_bitboard, player2_bitboard, True, 2)
-    print(col)
-
+    _ , col = minmax.minmax(player1_bitboard, player2_bitboard, True, 3)
     print(minmax.tree)
+    print(col)
+   
+
