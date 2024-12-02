@@ -27,16 +27,16 @@ class Heuristic (State):
         move_count = bin(self.player1_state | self.player2_state).count("1")
 
         if move_count < 15:  
-            weights = {'center': 5, 'two_connect': 8, 'three_connect': 15}
+            weights = {'center': 3, 'two_connect': 8, 'three_connect': 25}
         elif 15 <= move_count < 30:  
-            weights = {'center': 3, 'two_connect': 10, 'three_connect': 20}
+            weights = {'center': 2, 'two_connect': 10, 'three_connect': 30}
         else:  
-            weights = {'center': 2, 'two_connect': 12, 'three_connect': 25}
+            weights = {'center': 1, 'two_connect': 12, 'three_connect': 35}
 
         score = 0
 
         score += self.__evaluate(self.player1_state)
-        score -= self.__evaluate(self.player2_state)
+        # score -= self.__evaluate(self.player2_state)
 
         # Adding center control
         score += self.__center_control(self.player1_state) * weights['center']
