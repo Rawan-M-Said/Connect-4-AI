@@ -1,7 +1,7 @@
 import sys
 from heuristic import Heuristic
 from state import State
-from utilites import *
+from utilities import *
 import math
 
 class Minmax:
@@ -12,7 +12,9 @@ class Minmax:
         # base case when depth is zero or the board is complete
         if depth == 0 or (agent_state + human_state) == (2**42)-1:
             heuristic = Heuristic(agent_state, human_state)
-            return heuristic.calculate_heuristic()
+            return heuristic.calculate_heuristic(), None
+        
+        best_col = None
 
         if is_maximizing:
             max_eval = -math.inf
@@ -25,12 +27,15 @@ class Minmax:
                 
                 # drop it and get the state => child
                 child_state = drop_disc(agent_state, i, lowest_row)
-                eval = self.minmax(child_state, human_state , depth-1, not is_maximizing)
+                eval, _ = self.minmax(child_state, human_state , depth-1, not is_maximizing)
                 # save in the tree
+                self.save_node_in_tree(agent_state, human_state, i, eval)
+
                 if max_eval < eval :
                     max_eval = eval
+                    best_col = i
                 
-            return max_eval
+            return max_eval, best_col
                 
         else :
             min_eval = math.inf
@@ -43,9 +48,45 @@ class Minmax:
                 
                 # drop it and get the state => child
                 child_state = drop_disc(human_state, i, lowest_row)
-                eval = self.minmax(agent_state, child_state, depth-1, not is_maximizing)
+                eval, _ = self.minmax(agent_state, child_state, depth-1, not is_maximizing)
                 # save in the tree
-                min_eval = min(min_eval, eval)
-            return min_eval
-            
+                self.save_node_in_tree(agent_state, human_state, i, eval)
+                
+                if min_eval > eval :
+                    min_eval = eval
+                    best_col = i
+                    
+            return min_eval, best_col
     
+    def save_node_in_tree(self, agent_state, human_state, column, heuristic):
+        parent_key = (agent_state, human_state)
+        self.tree[parent_key] = {
+                "column": column,
+                "heuristic": heuristic,
+            }
+    
+    
+    
+if __name__ == "__main__":
+
+    board = [
+        [2, 1, 2, 1, 2, 0, 0],   
+        [2, 1, 2, 1, 2, 0, 0],   
+        [2, 1, 2, 1, 2, 0, 0],   
+        [2, 1, 2, 1, 2, 1, 0],   
+        [2, 1, 2, 1, 2, 1, 2],   
+        [2, 1, 2, 1, 2, 1, 2],   
+    ]
+
+
+    # Convert the board to bitboards
+    player1_bitboard = board_to_state(board, 1)
+    player2_bitboard = board_to_state(board, 2)
+
+    minmax = Minmax()
+    _ , col = minmax.minmax(player1_bitboard, player2_bitboard, True, 42)
+    print(col)
+
+
+
+

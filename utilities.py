@@ -1,3 +1,4 @@
+from minmax import Minmax
 from state import State
 import numpy as np
 
@@ -39,35 +40,3 @@ def get_lowest_available_row(agent_state, human_state, column):
     return -1
                 
             
-# # Initialize a 2D board (6x7)
-# board = [
-#     [0, 1, 0, 0, 0, 0, 1],   
-#     [0, 2, 0, 0, 0, 0, 0],  
-#     [0, 1, 0, 0, 0, 0, 0],  
-#     [0, 2, 0, 0, 0, 0, 0],  
-#     [0, 0, 1, 0, 2, 0, 0],  
-#     [0, 0, 2, 0, 1, 0, 0],   
-# ]
-
-# # Convert the board to bitboards
-# player1_bitboard = board_to_state(board, 1)
-# player2_bitboard = board_to_state(board, 2)
-
-# # Initialize the State object
-# game_state = State(player1_state=player1_bitboard, player2_state=player2_bitboard)
-
-# # Test dropping a disc
-# print(f"Initial Player 1 Bitboard: {bin(game_state.player1_state)}")
-# print(f"Initial Player 2 Bitboard: {bin(game_state.player2_state)}")
-
-# success = game_state.drop_disc(1, column=6)  # Player 1 drops a disc in column 1
-# print(f"Drop Disc Success: {success}")
-# print(f"Updated Player 1 Bitboard: {bin(game_state.player1_state)}")
-
-# # Check if the board is complete
-# board2 = state_to_board(game_state.player1_state, game_state.player2_state)
-# print(board2)
-
-
-
-
