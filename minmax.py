@@ -26,7 +26,7 @@ class Minmax:
                 
                 # drop it and get the state => child
                 child_state = drop_disc(agent_state, i, lowest_row)
-                eval, _ = self.minmax(agent_state, human_state, not is_maximizing, depth-1)
+                eval, _ = self.minmax(child_state, human_state, not is_maximizing, depth-1)
                 # save in the tree
                 self.save_node_in_tree(agent_state, human_state, i, eval)
                 
