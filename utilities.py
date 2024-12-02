@@ -1,5 +1,4 @@
-from minmax import Minmax
-from state import State
+
 import numpy as np
 
 def board_to_state(board, turn):
@@ -36,7 +35,7 @@ def get_lowest_available_row(agent_state, human_state, column):
     for row in range(6):
         pos =  base_pos + row
         if not ((agent_state & (1 << pos)) or (human_state & (1 << pos))) :  
-            return row
+            return 5 - row
     return -1
                 
             
