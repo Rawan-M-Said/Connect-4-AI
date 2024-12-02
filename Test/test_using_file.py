@@ -9,7 +9,7 @@ def parse_file(path):
     return eval(text)
 
 def find_best_move (board, turn):
-    algorithm = AlgorithmFactory("minmax with alpha-beta pruning",9)    
+    algorithm = AlgorithmFactory("minmax with alpha-beta pruning",10)    
     best_move,_,_ = algorithm.solve(board, turn)
     return best_move
         
