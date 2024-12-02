@@ -329,12 +329,12 @@ class ConnectFour:
         minmax = Minmax()
         player1_bitboard = board_to_state(self.board, 1)
         player2_bitboard = board_to_state(self.board, 2)
-        _, best_move = minmax.minmax(player1_bitboard, player2_bitboard, True, depth=4)
+        _, best_move = minmax.minmax(player2_bitboard, player1_bitboard, True, depth=4)
         self.tree = minmax.tree
         print(self.tree)
         self.drop_piece(best_move)
         self.check_connect_four(self.turn, self.get_next_open_row(best_move,self.board), best_move)
-        self.turn = 2  # Switch back to the human player
+        self.turn = 1  # Switch back to the human player
 
     def main(self):
         width = self.columns * SQUARE_SIZE
@@ -360,7 +360,7 @@ class ConnectFour:
                         event.pos[1] < 550 + 50:
                         print(self.boardCopy)
                         self.show_tree(2,self.boardCopy)
-                    if self.turn == 2:  # Human player's turn
+                    if self.turn == 1:  # Human player's turn
                         if event.pos[0] > width:
                             continue
                         column = int(event.pos[0] // SQUARE_SIZE)
@@ -369,7 +369,7 @@ class ConnectFour:
                             self.drop_piece(column)
                             self.check_connect_four(self.turn, row, column)
                             self.boardCopy = self.board.copy()
-                            self.turn = 1  # Switch to AI's turn
+                            self.turn = 2  # Switch to AI's turn
                             self.draw_board(screen, self.board)
                             self.draw_navbar(screen)
                             pygame.display.update()
@@ -381,7 +381,7 @@ class ConnectFour:
                                 pygame.time.wait(3000)
                                 pygame.quit()
                                 sys.exit()
-            if self.turn == 1 and not self.game_over:  # AI's turn
+            if self.turn == 2 and not self.game_over:  # AI's turn
                 self.ai_move()
                 self.draw_board(screen, self.board)
                 self.draw_navbar(screen)
