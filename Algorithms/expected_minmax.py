@@ -134,7 +134,4 @@ class ExpectedMinmax(Algorithm):
                     "human_state": human_state,
                 })
                 
-            
-
-        # Format heuristic to 6 decimal places only if it has a fraction
-       
+                   
