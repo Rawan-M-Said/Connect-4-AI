@@ -29,6 +29,7 @@ class AlgorithmFactory:
             human_state = board_to_state(board, 1)
         if self.algorithm_name == "expected minmax":
             _, best_move = self.algorithm.solve(agent_state, human_state, 'max', depth=self.depth)
+            return best_move, self.algorithm.tree, self.algorithm.node_expanded, self.algorithm.chance_nodes
         else:
             _, best_move = self.algorithm.solve(agent_state, human_state, True, self.depth)
         return best_move, self.algorithm.tree, self.algorithm.node_expanded

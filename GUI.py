@@ -37,6 +37,7 @@ class ConnectFour:
         self.boardCopy = self.board.copy()
         self.x_offsets = []
         self.tree = {}
+        self.chance_tree = {}
         self.current_depth = 1
         self.depth = 4
         self.selected_algorithm = "minmax without alpha-beta pruning"
@@ -187,7 +188,20 @@ class ConnectFour:
         children = []
         player1_bitboard = board_to_state(parent, 1)
         player2_bitboard = board_to_state(parent, 2)
-        heuristic = self.tree.get((player2_bitboard, player1_bitboard))
+        if self.selected_algorithm == "expected minmax":
+            print("a tree")
+            print(self.current_depth)
+            if self.current_depth % 2 == 0:
+                heuristic = self.chance_tree.get((player2_bitboard, player1_bitboard))
+                print(player1_bitboard)
+                print(player2_bitboard)
+                print(heuristic)
+                print("Chance tree")
+            else:
+                print("Player tree")
+                heuristic = self.tree.get((player2_bitboard, player1_bitboard))
+        else:
+            heuristic = self.tree.get((player2_bitboard, player1_bitboard))
         if heuristic:
             for state in heuristic:
                 if 'agent_state' in state and 'human_state' in state:
@@ -195,7 +209,7 @@ class ConnectFour:
                     child_human = state['human_state']
                     child = state_to_board( child_human,child_agent)
                     children.append((child, state['heuristic']))
-            return children
+        return children
     def draw_children(self, screen, children):
         child_width = self.columns * SQUARE_SIZE // 7
         child_height = self.rows * SQUARE_SIZE // 7
@@ -275,7 +289,11 @@ class ConnectFour:
                                     self.show_tree(player, children[i][0], previous_states)
 
     def ai_move(self):
-        best_move, self.tree,self.node_expanded = self.algorithm.solve(self.board)
+        if self.selected_algorithm == "expected minmax":
+            best_move, self.tree, self.node_expanded, self.chance_tree = self.algorithm.solve(self.board)
+            print(self.chance_tree)
+        else:
+            best_move, self.tree,self.node_expanded = self.algorithm.solve(self.board)
         self.drop_piece(best_move)
         self.check_connect_four(self.turn, self.get_next_open_row(best_move,self.board), best_move)
         self.turn = 1  # Switch back to the human player

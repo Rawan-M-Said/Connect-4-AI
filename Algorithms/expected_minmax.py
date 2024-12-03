@@ -110,7 +110,7 @@ class ExpectedMinmax(Algorithm):
             '.') if '.' in f"{heuristic:.6f}" else f"{heuristic:.6f}"
         
         if node_type == "chance":
-            if parent_key not in self.tree:
+            if parent_key not in self.chance_nodes:
                 self.chance_nodes[parent_key] = []
             self.chance_nodes[parent_key].append({
                 "column": column,
