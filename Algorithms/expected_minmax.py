@@ -4,6 +4,7 @@ import math
 
 class ExpectedMinmax(Algorithm):
     def __init__(self):
+        self.chance_nodes = {}
         self.prev_node_type =  'max'
         super().__init__()
 
@@ -103,40 +104,37 @@ class ExpectedMinmax(Algorithm):
             
     def save_node_in_tree(self, agent_state, human_state, child_state, column, heuristic, node_type):
         self.node_expanded += 1
+        
         parent_key = (agent_state, human_state)
-        if parent_key not in self.tree:
-            self.tree[parent_key] = []
-
-        # Format heuristic to 6 decimal places only if it has a fraction
         formatted_heuristic = f"{heuristic:.6f}".rstrip('0').rstrip(
             '.') if '.' in f"{heuristic:.6f}" else f"{heuristic:.6f}"
-
-        if column is None:
-            self.tree[parent_key].append({
-                "heuristic": formatted_heuristic
-            })
-        elif node_type == 'max':
-            self.tree[parent_key].append({
-                "column": column,
-                "heuristic": formatted_heuristic,
-                "agent_state": child_state,
-                "human_state": human_state,
-                "type" : node_type
-            })
-        elif node_type == 'min':
-            self.tree[parent_key].append({
+        
+        if node_type == "chance":
+            if parent_key not in self.tree:
+                self.chance_nodes[parent_key] = []
+            self.chance_nodes[parent_key].append({
                 "column": column,
                 "heuristic": formatted_heuristic,
                 "agent_state": agent_state,
                 "human_state": child_state,
-                "type" : node_type
+            })
+        else:
+            if parent_key not in self.tree:
+                self.tree[parent_key] = []
+                
+            if column is None:
+                self.tree[parent_key].append({
+                    "heuristic": formatted_heuristic
+                })
+            else:
+                 self.tree[parent_key].append({
+                    "column": column,
+                    "heuristic": formatted_heuristic,
+                    "agent_state": child_state,
+                    "human_state": human_state,
+                })
+                
+            
 
-            })
-        elif node_type == 'chance':
-            self.tree[parent_key].append({
-                "column": column,
-                "heuristic": formatted_heuristic,
-                "agent_state": agent_state,
-                "human_state": child_state,
-                "type" : node_type
-            })
+        # Format heuristic to 6 decimal places only if it has a fraction
+       
