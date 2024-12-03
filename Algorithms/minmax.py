@@ -70,30 +70,7 @@ class Minmax(Algorithm):
             self.transposition_table[state_key] = result
             return min_eval, best_col
     
-    def save_node_in_tree(self, agent_state, human_state, child_state, column, heuristic, is_agent_move):
-        self.node_expanded += 1
-        parent_key = (agent_state, human_state)
-        if parent_key not in self.tree:
-            self.tree[parent_key] = []
-            
-        if column == None:
-             self.tree[parent_key].append({
-                "heuristic": heuristic       
-            })
-        elif is_agent_move:
-            self.tree[parent_key].append({
-                "column": column,
-                "heuristic": heuristic,
-                "agent_state": child_state,          
-                "human_state": human_state           
-            })
-        else:
-            self.tree[parent_key].append({
-                "column": column,
-                "heuristic": heuristic,
-                "agent_state": agent_state,           
-                "human_state": child_state           
-            })
+    
     
 if __name__ == "__main__":
 
