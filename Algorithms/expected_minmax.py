@@ -80,23 +80,27 @@ class ExpectedMinmax(Algorithm):
                     if lowest_row != -1:
                         left_child_state = self.drop_disc(human_state, column-1, lowest_row)
                         left_eval, _ = self.solve(agent_state, left_child_state, type, depth-1)
+                        self.save_node_in_tree(agent_state, human_state, left_child_state, column-1, left_eval, node_type)
                         expected_eval += 0.2 * left_eval
                     lowest_row = self.get_lowest_available_row(agent_state, human_state, column+1)
                     if lowest_row != -1:
                         right_child_state = self.drop_disc(human_state, column+1, lowest_row)
                         right_eval, _ = self.solve(agent_state, right_child_state, type, depth-1)
+                        self.save_node_in_tree(agent_state, human_state, right_child_state, column+1, right_eval, node_type)
                         expected_eval += 0.2 * right_eval
                 if column == 0:
                     lowest_row = self.get_lowest_available_row(agent_state, human_state, column + 1)
                     if lowest_row != -1:
                         right_child_state = self.drop_disc(human_state, column + 1, lowest_row)
                         right_eval, _ = self.solve(agent_state, right_child_state, type, depth - 1)
+                        self.save_node_in_tree(agent_state, human_state, right_child_state, column + 1, right_eval, node_type)
                         expected_eval += 0.4 * right_eval
                 if column == 6:
                     lowest_row = self.get_lowest_available_row(agent_state, human_state, column - 1)
                     if lowest_row != -1:
                         left_child_state = self.drop_disc(human_state, column - 1, lowest_row)
                         left_eval, _ = self.solve(agent_state, left_child_state, type, depth - 1)
+                        self.save_node_in_tree(agent_state, human_state, left_child_state, column - 1, left_eval, node_type)
                         expected_eval += 0.4 * left_eval
                 valid_moves += 1
             if valid_moves == 0:
